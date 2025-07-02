@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  user_id   Int     @id @default(autoincrement())
+  user_name String?
+  password  String?
+  phone     String?
+  email     String?
+
+  companies   Company[]         @relation("UserCompanies")
+  memberships company_members[]
+  projects    user_project[]
+  todos       user_todo[]
+}
+
+model Company {
+  company_id       Int     @id @default(autoincrement())
+  company_name     String
+  company_location String?
+  owner_id         Int?
+
+  owner    Users?            @relation("UserCompanies", fields: [owner_id], references: [user_id], onDelete: SetNull)
+  members  company_members[]
+  projects Project[]
+}
+
+model company_members {
+  company_id Int
+  user_id    Int
+  user_role  String
+
+  company Company @relation(fields: [company_id], references: [company_id], onDelete: Cascade)
+  user    Users   @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  invited_members invited_member[] 
+
+  @@id([company_id, user_id])
+  @@unique([user_id])
+}
+
+model Project {
+  project_id          Int     @id @default(autoincrement())
+  project_name        String
+  project_description String?
+  company_id          Int
+
+  company    Company        @relation(fields: [company_id], references: [company_id], onDelete: Cascade)
+  users      user_project[]
+  tasks      Task[]
+  user_todos user_todo[] 
+}
+
+model user_project {
+  user_id    Int
+  project_id Int
+
+  user    Users   @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  project Project @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+
+  @@id([user_id, project_id])
+  @@unique([user_id])
+}
+
+model Task {
+  task_id          Int     @id @default(autoincrement())
+  task_name        String
+  task_description String?
+  project_id       Int
+
+  project Project @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+  todos   Todo[]
+}
+
+model Todo {
+  todo_id          Int       @id @default(autoincrement())
+  todo_name        String
+  todo_description String?
+  due_date         DateTime?
+  todo_priority    String?
+  todo_status      String?
+  task_id          Int
+
+  task           Task        @relation(fields: [task_id], references: [task_id], onDelete: Cascade)
+  assigned_users user_todo[]
+}
+
+model user_todo {
+  user_id    Int
+  todo_id    Int
+  project_id Int
+
+  user    Users   @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  todo    Todo    @relation(fields: [todo_id], references: [todo_id], onDelete: Cascade)
+  project Project @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+
+  @@id([user_id, todo_id])
+}
+
+model invited_member {
+  invited_id    Int    @id @default(autoincrement())
+  invited_by_id Int
+  status        String
+
+  inviter company_members @relation(fields: [invited_by_id], references: [user_id], onDelete: Cascade)
+}

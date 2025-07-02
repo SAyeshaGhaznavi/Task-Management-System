@@ -2,8 +2,8 @@
 create table Users (
     user_id SERIAL PRIMARY KEY,
     user_name VARCHAR (255),
-    user_role VARCHAR (255) CHECK( user_role in ('Owner', 'Admin', 'Member')),
-    phone int,
+    phone VARCHAR(255),
+    password VARCHAR(255),
     email VARCHAR (255)
 );
 
@@ -15,8 +15,7 @@ CREATE TABLE Company (
     FOREIGN KEY (owner_id) REFERENCES Users(user_id) ON DELETE SET NULL
 );
 
-
-drop Table Todo
+#drop Table Todo
 
 CREATE TABLE company_members(
     company_id INTEGER,
@@ -24,6 +23,7 @@ CREATE TABLE company_members(
     user_id INTEGER,
     FOREIGN KEY(user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     PRIMARY KEY(company_id, user_id)
+    user_role VARCHAR (255) CHECK( user_role in ('Owner', 'Admin', 'Member')),
 )
 
 CREATE TABLE Project(
