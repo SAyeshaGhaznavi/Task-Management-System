@@ -50,6 +50,14 @@ export class UserProjectService {
   });
 }
 
+  findProject(userid: number) {
+  return this.prisma.user_project.findMany({
+    where: {
+      user_id: userid,
+    },
+  });
+}
+
   update(project_id: number, user_id: number, updateUserProjectDto: UpdateUserProjectDto) {
   return this.prisma.user_project.update({
     where: {

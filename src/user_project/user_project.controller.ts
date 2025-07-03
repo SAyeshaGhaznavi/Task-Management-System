@@ -25,6 +25,14 @@ export class UserProjectController {
   ) {
     return this.userProjectService.findOne(+project_id,+user_id);
   }
+
+  @Get(':user_id')
+  findProject(
+    @Param('user_id') user_id:string,
+  )
+  {
+    return this.userProjectService.findProject(+user_id);
+  }
   
   @Patch(':user_id/:project_id')
   update(

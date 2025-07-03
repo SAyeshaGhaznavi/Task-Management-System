@@ -24,6 +24,14 @@ export class UserTodoController {
  ) {
    return this.userTodoService.findOne(+user_id, +todo_id);
  }
+
+ @Get(':user_id')
+  findTodo(
+    @Param('user_id') user_id:string,
+  )
+  {
+    return this.userTodoService.findTodo(+user_id);
+  }
  
  @Patch(':user_id/:todo_id')
  update(

@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { InvitedMemberService } from './invited_member.service';
 import { CreateInvitedMemberDto } from './dto/create-invited_member.dto';
 import { UpdateInvitedMemberDto } from './dto/update-invited_member.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Request } from 'express';
 
 @Controller('invited-member')
 export class InvitedMemberController {
@@ -22,9 +24,15 @@ export class InvitedMemberController {
     return this.invitedMemberService.findOne(+id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateInvitedMemberDto: UpdateInvitedMemberDto) {
-    return this.invitedMemberService.update(+id, updateInvitedMemberDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateInvitedMemberDto: UpdateInvitedMemberDto,
+    @Req() req: Request,
+  ) {
+    const user = req.user as any;
+    return this.invitedMemberService.update(+id, updateInvitedMemberDto, user.userId);
   }
 
   @Delete(':id')

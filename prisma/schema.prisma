@@ -18,7 +18,7 @@ model Users {
   user_name String?
   password  String?
   phone     String?
-  email     String?
+  email     String? @unique
 
   companies   Company[]         @relation("UserCompanies")
   memberships company_members[]
@@ -112,7 +112,7 @@ model user_todo {
 model invited_member {
   invited_id    Int    @id @default(autoincrement())
   invited_by_id Int
-  status        String
+  status        String @default("Pending")
 
   inviter company_members @relation(fields: [invited_by_id], references: [user_id], onDelete: Cascade)
 }

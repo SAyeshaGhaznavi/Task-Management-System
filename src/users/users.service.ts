@@ -17,9 +17,12 @@ export class UsersService {
     return this.prisma.users.findMany();
   }
 
-  findOne(id: number) {
-    return this.prisma.users.findUnique({ where: { user_id:id } });
+  findOne(identifier: number | string) {
+  if (typeof identifier === 'number') {
+    return this.prisma.users.findUnique({ where: { user_id: identifier } });
   }
+    return this.prisma.users.findUnique({ where: { email: identifier } });
+}
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return this.prisma.users.update({

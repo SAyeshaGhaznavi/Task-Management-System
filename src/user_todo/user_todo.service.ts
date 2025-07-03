@@ -61,6 +61,14 @@ export class UserTodoService {
   });
 }
 
+    findTodo(userid: number) {
+  return this.prisma.user_todo.findMany({
+    where: {
+      user_id: userid,
+    },
+  });
+}
+
   findAll() {
     return this.prisma.user_todo.findMany();
   }

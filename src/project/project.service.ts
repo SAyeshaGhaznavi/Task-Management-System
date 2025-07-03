@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -23,14 +23,41 @@ export class ProjectService {
     });
   }
 
-  async update(id: number, updateProjectDto: UpdateProjectDto) {
+
+  async update(id: number, updateProjectDto: UpdateProjectDto, userid:number) {
+
+    const userToProject=await this.prisma.user_project.findUnique({
+      where: {
+        user_id:userid,
+        project_id: id,
+      },
+    });
+
+    if(!userToProject)
+    {
+      throw new ForbiddenException("You are not authorized to update this Project");
+    }
+
     return this.prisma.project.update({
       where: { project_id: id },
       data: updateProjectDto,
     });
   }
 
-  async remove(id: number) {
+  async remove(id: number, userid:number) {
+
+    const userToProject=await this.prisma.user_project.findUnique({
+      where: {
+        user_id:userid,
+        project_id: id,
+      },
+    });
+
+    if(!userToProject)
+    {
+      throw new ForbiddenException("You are not authorized to update this Project");
+    }
+    
     return this.prisma.project.delete({
       where: { project_id: id },
     });
