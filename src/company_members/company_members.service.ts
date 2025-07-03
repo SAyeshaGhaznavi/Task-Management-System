@@ -51,4 +51,19 @@ export class CompanyMembersService {
     },
   });
   }
+
+  async isAdminOfCompany(userId: number, companyId: number): Promise<boolean> {
+    //console.log("User: ",userId);
+    //console.log("Company: ", companyId);
+  const member = await this.prisma.company_members.findFirst({
+    where: {
+      user_id: userId,
+      company_id: companyId,
+      user_role: 'ADMIN', 
+    },
+  });
+  //console.log("Member: ", member);
+  return !!member;
+}
+
 }

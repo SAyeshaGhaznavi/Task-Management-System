@@ -21,7 +21,7 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.json({ access_token: tokens.access_token });
+    return res.json({ refresh_token: tokens.refresh_token });
   }
 
   @Post('refresh')

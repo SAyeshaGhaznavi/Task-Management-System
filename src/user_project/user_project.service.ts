@@ -8,10 +8,32 @@ export class UserProjectService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUserProjectDto: CreateUserProjectDto) {
-    return this.prisma.user_project.create({ 
-      data: createUserProjectDto,
-    });
+  const { user_id, project_id } = createUserProjectDto;
+
+  const project = await this.prisma.project.findUnique({
+    where: { project_id: project_id },
+    select: { company_id: true },
+  });
+
+  if (!project) {
+    throw new Error('Project not found');
   }
+
+  const member = await this.prisma.company_members.findFirst({
+    where: {
+      user_id: user_id,
+      company_id: project.company_id,
+    },
+  });
+
+  if (!member) {
+    throw new Error('User is not part of the same company as the project');
+  }
+  return this.prisma.user_project.create({ 
+    data: createUserProjectDto,
+  });
+}
+
 
   findAll() {
     return this.prisma.user_project.findMany();
