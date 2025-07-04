@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserTodoDto } from './dto/create-user_todo.dto';
 import { UpdateUserTodoDto } from './dto/update-user_todo.dto';
+import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class UserTodoService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventsGateway: EventsGateway,
+  ) {}
 
   async create(createUserTodoDto: CreateUserTodoDto) {
     const {user_id, project_id,todo_id}=createUserTodoDto;
@@ -49,15 +53,15 @@ export class UserTodoService {
   }
 
   console.log("createUserTodoDto: ", createUserTodoDto);
+    //this.logger.log(`Notifying user ${user_id} about new TODO ${todo_id}`);
+    this.eventsGateway.notifyTodoAssigned(user_id, {
+      todoId: todo_id,
+      projectId: project_id,
+      message: 'You have been assigned a new TODO',
+    });
 
   return this.prisma.user_todo.create({ 
     data: createUserTodoDto
-    // {
-    //   user_id:user_id,
-    //   project_id:project_id,
-    //   todo_id:todo_id,
-      
-    // },
   });
 }
 
